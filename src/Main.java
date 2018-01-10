@@ -1,7 +1,10 @@
+import com.crimps.ui.AuthUtils;
 import com.crimps.ui.MainUI;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
 import javax.swing.*;
+
+import static javafx.application.Platform.exit;
 
 /**
  * @author crimps
@@ -13,9 +16,14 @@ public class Main {
             BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.translucencyAppleLike;
             org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
             UIManager.put("RootPane.setupButtonVisible", false);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        new MainUI();
+        if (!AuthUtils.authComputer()) {
+            return;
+        }else {
+            new MainUI();
+        }
     }
 }

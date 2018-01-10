@@ -33,14 +33,15 @@ public class MainUI extends JFrame{
 
     public MainUI() {
         this.setLayout(new BorderLayout());
-        this.setSize(800, 500);
+        this.setSize(1200, 500);
         //北面板：复制按钮、class文件夹设置
         JPanel northPanel = new JPanel();
         copyButton = getCopyButton();
         copyButton.setText("复制");
         classFilePathTextField = new JTextField();
+        classFilePathTextField.setPreferredSize(new Dimension(400, 30));
         setClassFileButton = getSetClassFileButton();
-        setClassFileButton.setText("选择");
+        setClassFileButton.setText("选择class文件夹");
         northPanel.add(classFilePathTextField);
         northPanel.add(setClassFileButton);
         northPanel.add(copyButton);
@@ -65,7 +66,7 @@ public class MainUI extends JFrame{
                 } else {
                     System.out.println(textArea.getText());
                     Map<String, Object> resultMap = CopyUtils.copy(textArea.getText(), classFilePathTextField.getText());
-//                    ArrayList<String> oldFileList = (ArrayList<String>)resultMap.get(CopyUtils.OLD_KEY);
+                    List<String> oldFileList = (List<String>)resultMap.get(CopyUtils.OLD_KEY);
                     ArrayList<String> newFileList = (ArrayList<String>)resultMap.get(CopyUtils.NEW_KEY);
                     //提示展示
 
@@ -84,7 +85,17 @@ public class MainUI extends JFrame{
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-                    JOptionPane.showMessageDialog(getMainUI(), "复制成功！", "提示", 0);
+                    StringBuffer tip = new StringBuffer("");
+                    for (String str : oldFileList) {
+                        if (str.contains("失败")) {
+                            tip.append(str).append("\n");
+                        }
+                    }
+                    if (StringUtils.isNotBlank(tip.toString())) {
+                        JOptionPane.showMessageDialog(getMainUI(), "复制异常", "警告", 0);
+                    } else {
+                        JOptionPane.showMessageDialog(getMainUI(), "复制成功！", "提示", 0);
+                    }
                 }
             }
         });
@@ -107,6 +118,13 @@ public class MainUI extends JFrame{
         return setClassFileButton;
     }
 
+    /**
+     * 将内容写入txt文件
+     * @param content 内容
+     * @param fileName 文件
+     * @return
+     * @throws Exception
+     */
     public static boolean writeTxtFile(String content,File  fileName)throws Exception{
         RandomAccessFile mm=null;
         boolean flag=false;
