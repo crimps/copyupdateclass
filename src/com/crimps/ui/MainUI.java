@@ -1,8 +1,7 @@
 package com.crimps.ui;
 
 import com.crimps.service.CopyUtils;
-import com.sun.deploy.panel.JavaPanel;
-import org.apache.commons.io.FileUtils;
+import com.crimps.service.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
@@ -27,6 +26,7 @@ public class MainUI extends JFrame{
     private JTextArea textArea;
 
     private String classFilePath;
+    private final String CONFIG_FILE = "config.txt";
 
     public MainUI getMainUI() {
         return this;
@@ -43,6 +43,7 @@ public class MainUI extends JFrame{
         classFilePathTextField.setPreferredSize(new Dimension(400, 30));
         setClassFileButton = getSetClassFileButton();
         setClassFileButton.setText("选择class文件夹");
+        setClassFilePathTextField();
         northPanel.add(classFilePathTextField);
         northPanel.add(setClassFileButton);
         northPanel.add(copyButton);
@@ -76,12 +77,8 @@ public class MainUI extends JFrame{
                     try {
                         if (!fileListFile.exists()) {
                             fileListFile.createNewFile();
-//                            StringBuffer content = new StringBuffer("");
-//                            for (String str : newFileList) {
-//                                content.append(str).append("\n");
-//                            }
                             String content = buildFileList(newFileList);
-                            writeTxtFile(content, fileListFile);
+                            FileUtils.writeTxtFile(content, fileListFile);
                         }
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -113,39 +110,17 @@ public class MainUI extends JFrame{
                 int result = fileChooser.showOpenDialog(getMainUI());
                 if (JFileChooser.APPROVE_OPTION == result) {
                     classFilePathTextField.setText(fileChooser.getSelectedFile().getPath());
+                    //写入配置文件
+                    try {
+                        FileUtils.writeTxtFile(fileChooser.getSelectedFile().getPath(), new File(CONFIG_FILE));
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+
                 }
             }
         });
         return setClassFileButton;
-    }
-
-    /**
-     * 将内容写入txt文件
-     * @param content 内容
-     * @param fileName 文件
-     * @return
-     * @throws Exception
-     */
-    public static boolean writeTxtFile(String content,File  fileName)throws Exception{
-        RandomAccessFile mm=null;
-        boolean flag=false;
-        FileOutputStream o=null;
-        try {
-            o = new FileOutputStream(fileName);
-            o.write(content.getBytes("GBK"));
-            o.close();
-//   mm=new RandomAccessFile(fileName,"rw");
-//   mm.writeBytes(content);
-            flag=true;
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
-        }finally{
-            if(mm!=null){
-                mm.close();
-            }
-        }
-        return flag;
     }
 
     private String buildFileList(List<String> fileList) {
@@ -158,5 +133,28 @@ public class MainUI extends JFrame{
             filePaths.append(str).append("\n");
         }
         return fileNames.toString() + "\n \n" + filePaths.toString();
+    }
+
+    /**
+     * 从配置文件中给路径文本初始值
+     */
+    private void setClassFilePathTextField() {
+        File configFile = new File(CONFIG_FILE);
+        if (configFile.exists()) {
+            try {
+                String classPath = FileUtils.readTxtFileFirstLine(configFile);
+                if (StringUtils.isNotBlank(classPath)) {
+                    classFilePathTextField.setText(classPath);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                configFile.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
