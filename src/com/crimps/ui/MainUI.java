@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -45,13 +46,14 @@ public class MainUI extends JFrame{
         northPanel.add(classFilePathTextField);
         northPanel.add(setClassFileButton);
         northPanel.add(copyButton);
+        northPanel.setBorder(new TitledBorder("信息"));
         this.add(northPanel, BorderLayout.NORTH);
         //中心面板
         JPanel centerPanel = new JPanel();
-        centerPanel.setBackground(Color.RED);
         centerPanel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         centerPanel.add(textArea, BorderLayout.CENTER);
+        centerPanel.setBorder(new TitledBorder("svn记录列表"));
         this.add(centerPanel, BorderLayout.CENTER);
         this.setVisible(true);
     }
@@ -68,19 +70,18 @@ public class MainUI extends JFrame{
                     Map<String, Object> resultMap = CopyUtils.copy(textArea.getText(), classFilePathTextField.getText());
                     List<String> oldFileList = (List<String>)resultMap.get(CopyUtils.OLD_KEY);
                     ArrayList<String> newFileList = (ArrayList<String>)resultMap.get(CopyUtils.NEW_KEY);
-                    //提示展示
-
                     //生成提取文件清单
                     String dir = (String) resultMap.get(CopyUtils.DIR);
                     File fileListFile = new File(dir + File.separator + "文件清单.txt");
                     try {
                         if (!fileListFile.exists()) {
                             fileListFile.createNewFile();
-                            StringBuffer content = new StringBuffer("");
-                            for (String str : newFileList) {
-                                content.append(str).append("\n");
-                            }
-                            writeTxtFile(content.toString(), fileListFile);
+//                            StringBuffer content = new StringBuffer("");
+//                            for (String str : newFileList) {
+//                                content.append(str).append("\n");
+//                            }
+                            String content = buildFileList(newFileList);
+                            writeTxtFile(content, fileListFile);
                         }
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -145,5 +146,17 @@ public class MainUI extends JFrame{
             }
         }
         return flag;
+    }
+
+    private String buildFileList(List<String> fileList) {
+        StringBuffer fileNames = new StringBuffer("##################### fileName list #####################").append("\n");
+        StringBuffer filePaths = new StringBuffer("##################### filePath list #####################").append("\n");
+        for (String str : fileList) {
+            String temp = StringUtils.isBlank(StringUtils.substringAfterLast(str, "/")) ?
+                    StringUtils.substringAfterLast(str, "\\") : StringUtils.substringAfterLast(str, "/");
+            fileNames.append(temp).append("\n");
+            filePaths.append(str).append("\n");
+        }
+        return fileNames.toString() + "\n \n" + filePaths.toString();
     }
 }

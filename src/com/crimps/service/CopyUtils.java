@@ -27,7 +27,11 @@ public class CopyUtils {
 
     public static Map<String, Object> copy(String javaContent, String classFilePath) {
         Map<String, Object> resultMap = new HashMap<>();
-        List<String> javaFileList = Arrays.asList(javaContent.split("\n"));
+        List<String> tempFileList = Arrays.asList(javaContent.split("\n"));
+        List<String> javaFileList = new ArrayList<>();
+        for (String str : tempFileList) {
+            javaFileList.add(str);
+        }
         ArrayList<String> filePathList = analyJavaContent(javaFileList);
         FileSystemView fsv = FileSystemView.getFileSystemView();
         File desktop = fsv.getHomeDirectory();
@@ -46,6 +50,30 @@ public class CopyUtils {
             }
 
         }
+        //复制内部类
+        List<String> inclassList = new ArrayList<>();
+        for (String str : filePathList) {
+            if (str.contains(EN_CLASS_FILE)) {
+                for(int i = 0; i < 10; i++) {
+                    String sourPath = classFilePath + File.separator + str.replace(EN_JAVA_FILE, "$" + i + EN_CLASS_FILE);
+                    String temp = str.replace(EN_CLASS_FILE, "$" + i + EN_CLASS_FILE);
+                    try {
+                        File sourFile = new File(classFilePath + File.separator + temp);
+                        if (sourFile.exists()) {
+                            File descFile = new File(descFile_ex + File.separator + DIR_NAME + File.separator + temp);
+                            FileUtils.copyFile(sourFile, descFile);
+                            javaFileList.add(sourPath + "复制成功");
+                            inclassList.add(temp);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        javaFileList.add(sourPath + "复制失败");
+                        inclassList.add(temp);
+                    }
+                }
+            }
+        }
+//        filePathList.addAll(inclassList);
         resultMap.put(DIR, descFile_ex);
         resultMap.put(OLD_KEY, javaFileList);
         resultMap.put(NEW_KEY, filePathList);
