@@ -9,8 +9,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.RandomAccessFile;
 import java.util.*;
 import java.util.List;
 
@@ -57,6 +55,7 @@ public class MainUI extends JFrame{
         centerPanel.setBorder(new TitledBorder("svn记录列表"));
         this.add(centerPanel, BorderLayout.CENTER);
         this.setVisible(true);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     private JButton getCopyButton() {
@@ -93,6 +92,7 @@ public class MainUI extends JFrame{
                         JOptionPane.showMessageDialog(getMainUI(), "复制异常", "警告", 0);
                     } else {
                         JOptionPane.showMessageDialog(getMainUI(), "复制成功！", "提示", 0);
+                        FileUtils.open_directory(dir);
                     }
                 }
             }

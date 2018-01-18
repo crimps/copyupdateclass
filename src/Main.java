@@ -4,6 +4,8 @@ import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
 import javax.swing.*;
 
+import java.awt.*;
+
 import static javafx.application.Platform.exit;
 
 /**
@@ -23,7 +25,17 @@ public class Main {
         if (!AuthUtils.authComputer()) {
             return;
         }else {
-            new MainUI();
+//            new MainUI();
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        new MainUI();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 }

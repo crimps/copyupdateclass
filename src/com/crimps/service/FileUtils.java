@@ -1,5 +1,7 @@
 package com.crimps.service;
 
+import sun.plugin2.util.SystemUtil;
+
 import java.io.*;
 
 /**
@@ -45,5 +47,23 @@ public class FileUtils {
             }
         }
         return flag;
+    }
+
+    public static void open_directory(String folder) {
+        File file = new File(folder);
+        if (!file.exists()) {
+            return;
+        }
+        Runtime runtime = null;
+        try {
+            runtime = Runtime.getRuntime();
+            runtime.exec("cmd /c start explorer " + folder);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (null != runtime) {
+                runtime.runFinalization();
+            }
+        }
     }
 }
